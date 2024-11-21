@@ -1,5 +1,3 @@
-
-
 from datetime import datetime
 from googletrans import Translator
 selected_language = 'en'
@@ -119,23 +117,35 @@ def is_clinic_open(clinic_hours, visit_time):
     close_time = datetime.strptime(close_time, "%I %p")
     return open_time <= visit_time <= close_time
 
-# Filter clinics based on user criteria
 def filter_clinics(places, reachable_places, max_cost=None, service=None, min_rating=None, visit_time=None):
     results = []
-    service = service.lower() if service else None
+    service = service.lower() if service else None  # Convert service to lowercase if provided
     
     for place in reachable_places:
-        if place in places:
+        if place in places:  # Ensure place is in places dictionary
             for clinic in places[place]:
-                clinic_services = [ s.lower() for s in clinic["services"]]
+                # Convert clinic services to lowercase for case-insensitive comparison
+                clinic_services = [s.lower() for s in clinic["services"]]
+                
+                # Get clinic rating safely, default to 0 if not present
+                clinic_rating = clinic.get("rating", 0)
+                
+                # Check if the clinic meets all the filter criteria
                 if (max_cost is None or clinic["cost"] <= max_cost) and \
                    (service is None or service in clinic_services) and \
-                   (min_rating is None or clinic["rating"] >= min_rating):
+                   (min_rating is None or clinic_rating >= min_rating):
+                    
+                    # Add the distance of the clinic from reachable places
                     clinic["distance"] = reachable_places[place]
+                    
+                    # If visit_time is provided, check if the clinic is open
                     if visit_time:
                         clinic_open_status = is_clinic_open(clinic["hours"], visit_time)
                         clinic["status"] = "Open" if clinic_open_status else "Closed"
+                    
+                    # Add the clinic to the result list
                     results.append(clinic)
+    
     return results
 
 # Display the filtered results
@@ -162,7 +172,7 @@ def display_clinics(filtered_clinics):
                 st1=translate_to_hindi(str(clinic['cost']))
                 print(st+st1)
                 st=translate_to_hindi("Rating: ")
-                st1=translate_to_hindi(str(clinic['rating']))
+                st1=translate_to_hindi(str(clinic["rating"]))
                 print(st+st1)
                 st=translate_to_hindi("Distance: ")
                 st1=translate_to_hindi(str(clinic['distance']))
