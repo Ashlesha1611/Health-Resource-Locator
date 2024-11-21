@@ -1,11 +1,9 @@
 
-import sys
+
 from datetime import datetime
 from googletrans import Translator
-import codecs
 selected_language = 'en'
 translator = Translator()
-sys.stdout.reconfigure(encoding='utf-8')
 
 
 distances = {
