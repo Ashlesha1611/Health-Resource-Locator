@@ -142,6 +142,8 @@ def filter_clinics(places, reachable_places, max_cost=None, service=None, min_ra
                     if visit_time:
                         clinic_open_status = is_clinic_open(clinic["hours"], visit_time)
                         clinic["status"] = "Open" if clinic_open_status else "Closed"
+                    else:
+                        clinic["status"] = "Status Unknown"  # Default status if visit_time is not provided
                     
                     # Add the clinic to the result list
                     results.append(clinic)
